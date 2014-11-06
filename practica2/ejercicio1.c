@@ -14,7 +14,7 @@ void imprimeCadena(void * cadena){//funcion para imprimir por pantalla
 }
 
 int main(int argc,char * argv[]){
-	char * cadena1="Hola";//char * argv???
+	char * cadena1="Hola";
 	char * cadena2="Mundo";
 	system("clear");
 	pthread_t hilo1,hilo2;
