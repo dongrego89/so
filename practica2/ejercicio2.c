@@ -7,8 +7,9 @@ void * generaAleatorio(void * indice){
 int aleatorio1,aleatorio2,contador;
 int * suma;
 
-suma=malloc(sizeof(int));
-sleep(*(int *)indice);//Como indice es un puntero a la posición del vector de indices usamos * y hacemos casting para deshacer void
+suma=(int*)malloc(sizeof(int));
+sleep(*(int *)indice);
+//Como indice es un puntero a la posición del vector de indices usamos hacemos casting para deshacer void
 srand(time(NULL));
 
 aleatorio1=rand()%10;
@@ -37,6 +38,9 @@ scanf("%d",&numHebras);
 
 pthread_t vectorHebras[numHebras];
 int indices[numHebras];
+void * pindices;
+
+pindices=indices;
 
 for(i=0;i<numHebras;i++){
 	indices[i]=i;
@@ -44,7 +48,7 @@ for(i=0;i<numHebras;i++){
 
 
 for(i=0;i<numHebras;i++){
-	pthread_create(&vectorHebras[i],NULL,(void *)generaAleatorio,(void *)&indices[i]);
+	pthread_create(&vectorHebras[i],NULL,(void *)generaAleatorio,(void *)pindices);
 }
 
 for(i=0;i<numHebras;i++){
