@@ -1,5 +1,6 @@
 #include<stdio.h>
-#include<stdlib.h>
+#include<ls
+stdlib.h>
 #include<time.h>
 #include<pthread.h>
 
@@ -22,26 +23,28 @@ void * sumaParcial(void * parejas){
 	printf("\n \tSuma parcial vale %d",*suma);
 }
 
-int main(int argc, char* argv[]){
+
+
+int main(int argc, char* argv[]){//Funcion Principal
 system("clear");
 
-if(argc!=2){
+if(argc!=2){//Comprobación del número de hilos como parametro
 	printf("\nSe debe pasar un numero de hilos como parametro\n");
 	return -1;
 }
 else{
-	int i=10,j,vector[i],nHilos=atoi(argv[1]),corteA=0,corteB=0,resto;//hacerle un atoi
+	int i=10,j,vector[i],nHilos=atoi(argv[1]),corteA=0,corteB=0,resto;
 	pares parejas;
 
-	if((nHilos>10) || (nHilos<=0)){
+	if((nHilos>10) || (nHilos<=0)){//Permitiremos solo entre 1-10 hilos
 		printf("\nEl numero de hilos no debe superar a 10 ni ser inferior a 1\n");
 		return -1;
 	}
 	
-	srand(time(NULL));//Inicialización de semilla
+	srand(time(NULL));//Inicialización de semilla para aleatorios
 	printf("\nNuestro vector aleatorio es: ");
 
-	for(j=0;j<i;j++){
+	for(j=0;j<i;j++){//Vector de aleatorios del 0 al 9
 		vector[j]=rand()%10;
 		printf("[%d]",vector[j]);
 	}
@@ -66,9 +69,10 @@ else{
 		parejas.cb=corteB;
 		parejas.vector=vector;
 
-		sumaParcial((void *)&parejas);
+		//sumaParcial((void *)&parejas);
 
-	//DEPUR	printf("\n Corte A: %d - Corte B: %d - Resto %d",corteA,corteB,resto);	
+		//Soltamos los hilos
+
 		
 	}
 		
