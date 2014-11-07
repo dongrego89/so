@@ -28,26 +28,29 @@ int main(int argc,char * argv[]){
 int i,nHilos=argc-1;
 char ** archivos;
 pthread_t * hilos;
+system("clear");
+if(argc>1){
+	hilos=malloc(sizeof(pthread_t)*nHilos);
 
-hilos=malloc(sizeof(pthread_t)*nHilos);
+	archivos=malloc(sizeof(char)*nHilos);
 
+	for(i=1;i<argc;i++){
+		archivos[i-1]=argv[i];
+		//printf("\n - %s",archivos[i-1]);
+	}
 
-archivos=malloc(sizeof(char)*nHilos);
+	for(i=0;i<nHilos;i++){
+		pthread_create(&hilos[i],NULL,(void *)conversionMP3,(void *)archivos[i]);
+	}
 
-for(i=1;i<argc;i++){
-	archivos[i-1]=argv[i];
-	//printf("\n - %s",archivos[i-1]);
+	for(i=0;i<nHilos;i++){
+		pthread_join(hilos[i],NULL);
+	}
+
+	printf("\n");
 }
-
-for(i=0;i<nHilos;i++){
-	pthread_create(&hilos[i],NULL,(void *)conversionMP3,(void *)archivos[i]);
+else{
+	printf("\nNecesitas enviar algun fichero como parametro\n");
 }
-
-for(i=0;i<nHilos;i++){
-	pthread_join(hilos[i],NULL);
-}
-
-printf("\n");
-
 return 0;
 }
