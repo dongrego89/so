@@ -57,12 +57,12 @@ if(argc==2){
 	
 		if(i!=0){//Si no es la primera iteracion
 			indiceA=indiceB+1;
-			indiceB=indiceA+(10/nHilos)-1;
 		}
 		else{//Si es la primera iteracion	
 			indiceA=0;
-			indiceB=indiceA+(10/nHilos)-1;
 		}	
+		
+		indiceB=indiceA+(10/nHilos)-1;
 		
 		if(resto!=0){
 			indiceB++;
