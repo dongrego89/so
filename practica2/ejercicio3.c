@@ -11,10 +11,10 @@ typedef struct{
 
 
 void * sumaParcial(void * parejas){
-	printf("aaaaaaa\n");	
-	pares * aux=(pares *)parejas;
+	pares * aux;
+	aux=(pares *)malloc(sizeof(pares));
+	aux=(pares *)parejas;
 	int i,*suma;
-	printf("bbbbbb\n");	
 	suma=(int*)malloc(sizeof(int));
 	*suma=0;
 
