@@ -1,0 +1,7 @@
+pthread_mutex_t lock;//memoria global en proceso
+
+pthread_mutex_init(&lock,NULL);
+pthread_lock(&lock);//seccion critica
+pthread_unlock(&lock);//seccion critica
+pthread_destroy(&lock);
+
