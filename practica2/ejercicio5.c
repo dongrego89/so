@@ -5,8 +5,8 @@
 
 void * cuentaLineas(void * fichero){
 	char * auxiliar;
-	char ruta[200];
 	int * retorno;
+	int c;
 
 	FILE * archivo;
 
@@ -15,38 +15,46 @@ void * cuentaLineas(void * fichero){
 
 	archivo=fopen(auxiliar,"r");
 
-	//funcion contadora de lineas	PETA, REVISAR
 	*retorno=0;
-	
-	while(!feof(archivo)){
-		if(fgetc(archivo)=='\n'){
-			*retorno++;
+
+ 	while((c=fgetc(archivo))!=EOF){//Contamos los retornos de carro para conocer el nº de lineas
+       		if(c=='\n'){
+			*retorno+=1;
 		}
 	}
 	
 	fclose(archivo);
+	printf("\n Sumatorio de lineas: %d",*retorno);
 	pthread_exit((void *)retorno);	
 }
 
 int main(int argc, char * argv[]){
 
-int nArchivos,i,lineasTotales=0;
-pthread_t * hilos=NULL;
-void * subTotal;
+system("clear");
+
+if(argc>1){
+	int nArchivos,i,lineasTotales=0;
+	pthread_t * hilos=NULL;
+	void * subTotal;
 
 
-nArchivos=argc-1;
-hilos=(pthread_t *)malloc(sizeof(pthread_t)*nArchivos);
 
-for(i=1;i<argc;i++){
-	pthread_create(&hilos[i-1],NULL,(void *)cuentaLineas,(void *)&argv[i]);
+	nArchivos=argc-1;
+	hilos=(pthread_t *)malloc(sizeof(pthread_t)*nArchivos);
+
+	for(i=1;i<argc;i++){
+		pthread_create(&hilos[i-1],NULL,(void *)cuentaLineas,(void *)argv[i]);
+	}
+
+	for(i=0;i<nArchivos;i++){
+		pthread_join(hilos[i],(void **)&subTotal);
+		lineasTotales+=*(int*)subTotal;
+	}
+
+	printf("\n \nTotal de lineas %d en %d ficheros\n\n",lineasTotales,nArchivos);
 }
-
-for(i=0;i<nArchivos;i++){
-	pthread_join(hilos[i],(void **)&subTotal);
-	lineasTotales+=*(int*)subTotal;
+else{
+	printf("\nEs necesario pasar como argumento un nombre de fichero texto como minimo\n\n");
 }
-
-printf("Entre los %d ficheros hay %d lineas",nArchivos,lineasTotales);
 return 0;
 }
