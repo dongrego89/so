@@ -16,8 +16,10 @@ void * imprimeCaracter(void * caracter){
 	
 	//Seccion critica
 
-	for(i=0;i<5;i++){
-		printf("%c",*c);		
+	for(i=0;i<5;i++){	
+		printf("%c",*c);
+		fflush(stdout);
+		sleep(1);		
 	}
 	
 	s=pthread_mutex_unlock(&semaforo);	
@@ -31,34 +33,25 @@ void * imprimeCaracter(void * caracter){
 
 int main(int argc, char * argv[]){
 
-char * vectorCaracteres="!#*%";
+char * vectorCaracteres="!#*";
 pthread_t * hilos;
 int i;
 
 pthread_mutex_init(&semaforo,NULL);
 
-hilos=(pthread_t *)malloc(sizeof(pthread_t)*4);
+hilos=(pthread_t *)malloc(sizeof(pthread_t)*3);
 
 system("clear");
 printf("\n\n");
 
-for(i=0;i<4;i++){
+for(i=0;i<3;i++){
 	pthread_create(&hilos[i],NULL,(void *)imprimeCaracter,(void*)&vectorCaracteres[i]);
 }
 
-for(i=0;i<4;i++){
+for(i=0;i<3;i++){
 	pthread_join(hilos[i],NULL);
 }
 printf("\n\n");
 
 return 0;
 }
-
-
-
-/*nhilos = 3
-
-estruct
-	niteraciones=5
-	caracter=?
-semaforo binario ejemplo1.c*/
