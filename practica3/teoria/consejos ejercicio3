@@ -1,0 +1,22 @@
+exisitra una hebra consumidor, con su variable local posicion que es por donde va leyendo del buffer
+
+existira una hebra productor, con su variable local posicion que es por donde va escribiendo
+
+
+ambas podran acceder al valor de la variable global Nelementos, que con cada consumicion o produccion se
+decrementará o incrementará, de modo que al llegar al tope inferior el productor no tenga nada que leer
+y al llegar al nmaximo de elementos el productor no tenga sitio para producir
+
+
+
+
+
+/*
+1a version
+mutex, array de elementos, nelementos
+
+2a version
+idem + 2 variables de condicion
+-para buffer lleno
+-para 
+*/
