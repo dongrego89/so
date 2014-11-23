@@ -1,7 +1,9 @@
-/*  Implemente el problema para hilos teniendo en cuenta que la sección crítica va a ser un
-array de enteros con una capacidad de 5 elementos. Haga una implementación usando mutexs pero no
-variables de condición, por lo que se producirá espera activa en casos en los que no haya sitio donde
-producir o no haya items que consumir */
+/*  Modifique el apartado a) usando variables de condición junto con mutexs para evitar espera
+activa. Cuando el consumidor toma un producto notifica al productor que puede comenzar a trabajar
+nuevamente porque al menos hay un hueco donde poner una producción. En caso contrario si el
+buffer se vacía, el consumidor se pone a dormir y en el momento en que el productor agrega un
+producto crea una señal para despertarlo. Consulte la documentación de clases de teoría si lo
+considera oportuno. A continuación se muestra una solución en pseudocódigo*/
 
 #include <pthread.h>
 #include <stdlib.h>
@@ -13,6 +15,8 @@ producir o no haya items que consumir */
 #define FALSE 0
 
 pthread_mutex_t semaforo;//Declaracion de semáforo
+pthread_cond_t cond1;//Declaracion de condicion
+pthread_cond_t cond2;//Declaracion de condicion
 
 int * buffer;//Declaracion de puntero array de enteros
 int tamBuffer;//Numero de elementos del buffer
@@ -28,6 +32,8 @@ void validaUnlock(int e);//Funcion captadora de errores en desbloqueo de semafor
 int main(){
 	srand(time(NULL));//Semilla para aleatorios	
 	pthread_mutex_init(&semaforo,NULL);//Inicialización de semáforo
+	pthread_cond_init(&cond1,NULL);//Inicializacion de condicionales
+	pthread_cond_init(&cond2,NULL);
 
 	pthread_t * hilos;
 
@@ -73,14 +79,18 @@ void * produce(void * l){
 	
 	while(TRUE){
 		if(*limit!=0){//Si no hemos llegado al limite de producciones..
-	
-			while(usoBuffer==tamBuffer){//Mientras el buffer este lleno... Espera Activa
-				//printf("\n\n\t...Espera activa...");
-			}
-		
+
 			error=pthread_mutex_lock(&semaforo);//Bloqueo de seccion critica
 			validaLock(error);
 
+			while(usoBuffer==tamBuffer){//Mientras el buffer este lleno... Espera con variable condicional
+				printf("\n\n\t...Esperando a que se vacie el buffer...\n");
+				error=pthread_cond_wait(&cond1,&semaforo);
+				if(error!=0){
+					printf("\n\t- Error en pthread_cond_wait...");
+				}
+			}
+			
 			buffer[posicion]=rand()%10;//Se almacena un aleatorio en esa posicion
 
 			usoBuffer+=1;//Hay un elemento util nuevo en el buffer
@@ -92,6 +102,11 @@ void * produce(void * l){
 			
 			error=pthread_mutex_unlock(&semaforo);//Liberacion de seccion critica
 			validaUnlock(error);
+			
+			error=pthread_cond_signal(&cond2);
+			if(error!=0){
+				printf("\n\t- Error en pthread_cond_signal...");
+			}
 		}
 
 	}
@@ -103,19 +118,29 @@ void * consume(void * arg){
 	int error;
 	
 	while(TRUE){
-		while(usoBuffer==0){//Mientras el buffer este vacío... Espera activa
-			//printf("\n\n\t...Espera activa...");
-		};
 		
 		error=pthread_mutex_lock(&semaforo);//Bloqueo de seccion critica
 		validaLock(error);	
 	
+		while(usoBuffer==0){//Mientras el buffer este vacío... Espera con variables condicionales
+			printf("\n\n\t...Esperando a que se llene el buffer...\n");
+			error=pthread_cond_wait(&cond2,&semaforo);	
+			if(error!=0){
+				printf("\n\t- Error en pthread_cond_wait...");
+			}	
+		}
+
 		usoBuffer-=1;//Decrementamos el numero de elementos utiles del buffer
 		printf("\n\t[-] E.Consumido: %d | Posicion: %d | E.Utiles: %d",buffer[posicion],posicion,usoBuffer);		
 	
 		posicion=(posicion+1)%tamBuffer;//Incrementamos circularmente la posicion
 		error=pthread_mutex_unlock(&semaforo);//Liberacion de seccion critica
 		validaUnlock(error);
+		
+		error=pthread_cond_signal(&cond1);
+		if(error!=0){
+			printf("\n\t- Error en pthread_cond_signal...");
+		}
 	}
 	pthread_exit(NULL);
 }
