@@ -73,12 +73,13 @@ void * escritor(void * limite){
 	int l=*(int *)limite;
 	
 	while(l!=0){
-		pthread_mutex_lock(&semaforo2);
-		recurso=rand()%10;
+		pthread_mutex_lock(&semaforo2);//Antes de entrar a seccion critica se bloquea el semaforo del escritor
+		recurso=rand()%10;//generamos un recurso
 		printf("\n\t[+]Escritor añadiendo %d\n",recurso);
-		pthread_mutex_unlock(&semaforo2);
-		sleep(rand()%4);
+		pthread_mutex_unlock(&semaforo2);//Desbloqueamos el semaforo del escritor
+		
 		l--;
+		sleep(rand()%4);//Tiempo de espera aleatorio
 	}
 
 	pthread_exit(NULL);
@@ -88,27 +89,36 @@ void * lector(void * limite){
 	int l=*(int *)limite;
 
 	while(l!=0){
-		pthread_mutex_lock(&semaforo1);
+		//COMIENZO Control de numero de lectores
+		pthread_mutex_lock(&semaforo1);//Si es la primera iteracion pasa
 
-		numeroLectores+=1;
+		numeroLectores+=1;//incrementa el numero de lectores 
 	
 		if(numeroLectores==1){
-			pthread_mutex_lock(&semaforo2);
+			pthread_mutex_lock(&semaforo2);//Se bloquea el acceso al escritor una vez hay un lector
 		}	
 		
-		pthread_mutex_unlock(&semaforo1);
+		pthread_mutex_unlock(&semaforo1);//Se desbloquea el semaforo de escritores por si quiere entrar otro más
 
-		printf("\n\t[$]Lector leyendo %d\n",recurso);
-		pthread_mutex_lock(&semaforo1);
-		sleep(rand()%3);
+		//FIN Control de numero de lectores
+
+		printf("\n\t[$]Lector leyendo %d\n",recurso);//Uso del recurso
+		
+	
+		//COMIENZO Control de numero de lectores
+		pthread_mutex_lock(&semaforo1);//se bloquea el semaforo de los lectores
+		
 		numeroLectores-=1;
 
 		if(numeroLectores==0){
-			pthread_mutex_unlock(&semaforo2);
+			pthread_mutex_unlock(&semaforo2);//Cuando no quedan lectores leyendo desbloqueamos el semaforo de los escritores
 		}
 
-		pthread_mutex_unlock(&semaforo1);
-		l--;
+		pthread_mutex_unlock(&semaforo1);//Desbloqueamos el semaforo de lectores para que puedan seguir entrando o finalizen
+		sleep(rand()%3);//Tiempo de espera aleatorio
+		//FIN Control de numero de lectores		
+	
+		l--;//Decrementamos el limite de lecturas
 	}
 
 pthread_exit(NULL);
